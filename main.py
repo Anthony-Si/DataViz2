@@ -10,10 +10,10 @@ app = Dash(__name__)
 
 
 
-df_stud1=pd.read_csv('.\\student-mat.csv',sep=';')
+df_stud1=pd.read_csv('student-mat.csv',sep=';')
 #print(df_stud1.info())
 
-df_stud2=pd.read_csv('.\\student-por.csv',sep=';')
+df_stud2=pd.read_csv('student-por.csv',sep=';')
 #print(df_stud2.info())
 
 df_students = pd.concat([df_stud1, df_stud2], axis=0)
