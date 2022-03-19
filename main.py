@@ -49,7 +49,7 @@ df_SF_Time
 
 fig1 = px.scatter(df_SF_Time, x="Grade", y="Number of Students", color="failures", facet_col="studytime",
                   color_continuous_scale="deep_r")
-
+fig1.update_layout(title_text='The impact of study time on the number of failures', title_x=0.5,margin=dict(t=100))
 # --------------------------------------------------------------------------------------------------------------#
 # H- the effect of having family, School support and Private classes on performance of students
 df_support = df_students.loc[:, ["schoolsup", "famsup", "paid", "G1", "G2", "G3"]]
@@ -87,7 +87,10 @@ app.layout = html.Div(children=[
         dcc.Graph(id='SF_Time',
                   figure=fig0)
     ]),
-
+    dcc.Graph(
+        id='SI_Performance',
+        figure=fig1
+    ),
     html.Div(children=[
         html.H4("Supporter 1"),
         dcc.Dropdown(sorted(df_support['support'].unique()), "Family", id='support_drop')
@@ -98,10 +101,7 @@ app.layout = html.Div(children=[
         dcc.Dropdown(sorted(df_support['support'].unique()), "School", id='support_drop1')
 
     ], style={'width': '48%', 'display': 'inline-block'}),
-    dcc.Graph(
-        id='SI_Performance',
-        figure=fig1
-    ),
+
     dcc.Graph(id='ScFmPa_S_Time'),
 
 ])
