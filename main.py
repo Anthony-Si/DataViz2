@@ -34,7 +34,7 @@ df_SI_Time = (df_SI_Time.groupby(["internet", "studytime", "Grade"]).size()
               .reset_index(name='Number of Students'))
 df_SI_Time = df_SI_Time.sort_values(by=["studytime"])
 fig0 = px.histogram(df_SI_Time, y="Number of Students", x="Grade", color="internet", facet_col="studytime")
-fig0.update_layout(title_text='The effect of Studying Time and having Internet access on th performance of the Students', title_x=0.5,margin=dict(t=100))
+fig0.update_layout(title_text='The effect of Studying Time and having Internet access on the performance of the Students', title_x=0.5,margin=dict(t=100))
 # --------------------------------------------------------------------------------------------------------------#
 
 # B - the impact of study time and free time on studdent performance
@@ -79,12 +79,10 @@ df_support = df_support.sort_values(by=["Grade"])
 df_gender_ages=df_students.loc[:,["sex","age","G1","G2","G3"]]
 df_gender_ages["Grade"]=round((df_gender_ages["G1"]+df_gender_ages["G2"]+df_gender_ages["G3"])/3,2)
 df_gender_ages=df_gender_ages.loc[:,["sex","age","Grade"]]
-# F is 1 and M is 0
-df_gender_ages["sex"]=df_gender_ages.sex.map(dict(F=1, M=0))
-df_gender_ages.sort_values(by=["age","Grade"])
-
-
-
+df_gender_ages = (df_gender_ages.groupby(["sex","age","Grade"]).size()
+              .sort_values(ascending=False)
+              .reset_index(name='#Students'))
+df_gender_ages=df_gender_ages.sort_values(by=["Grade","#Students"])
 
 # Application  Dash
 app = Dash(__name__)
@@ -112,8 +110,18 @@ app.layout = html.Div(children=[
     ], style={'width': '48%', 'display': 'inline-block'}),
 
     dcc.Graph(id='ScFmPa_S_Time'),
-    dcc.Graph(id='Male-Female', figure=fig2)
 
+    html.Div(children=[
+        html.H4("From Age"),
+        dcc.Dropdown(sorted(df_gender_ages['age'].unique()), 15, id='age_drop')
+
+    ], style={'width': '48%', 'display': 'inline-block'}),
+    html.Div(children=[
+        html.H4("To Age"),
+        dcc.Dropdown(sorted(df_gender_ages['age'].unique()), 15, id='age_drop_1')
+
+    ], style={'width': '48%', 'display': 'inline-block'}),
+    dcc.Graph(id='Sex_Age_Grades')
 ])
 
 
@@ -124,8 +132,27 @@ app.layout = html.Div(children=[
 def update_graph(support_drop, support_drop1):
     df = df_support[(df_support['support'] == support_drop) | (df_support['support'] == support_drop1)]
     fig = px.line(df, y="Number of Students", x="Grade", color=df_support.columns[0])
+    fig.update_layout(
+        title_text='The effect of having Family, School Support and Private Classes on Student Performance',
+        title_x=0.5, margin=dict(t=100))
     return fig
 
+@app.callback(
+    Output(component_id='Sex_Age_Grades', component_property='figure'),
+    Input(component_id='age_drop', component_property='value'),
+    Input(component_id='age_drop_1', component_property='value'))
+def update_graph_1(age_drop, age_drop_1):
+    if age_drop> age_drop_1:
+        temp=age_drop
+        age_drop=age_drop_1
+        age_drop_1=temp
+    df = df_gender_ages[(df_gender_ages['age']>= age_drop) & (df_gender_ages['age'] <= age_drop_1)]
+    fig_t= px.area(df, x="Grade", y="#Students", color='sex',
+                  facet_row='age', facet_col='sex')
+    fig_t.update_layout(
+        title_text='Grades analysis between Genders and ages',
+        title_x=0.5, margin=dict(t=100))
+    return fig_t
 
 if __name__ == '__main__':
     app.run_server(debug=True)
