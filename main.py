@@ -1,78 +1,121 @@
-
-from dash import Dash, html, dcc
+import dash.exceptions
+from dash import Dash, html, dcc, Output, Input
 import plotly.express as px
 import pandas as pd
 import plotly.graph_objs as go
 import plotly.figure_factory as ff
 import numpy as np
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 
-app = Dash(__name__)
+df_stud1 = pd.read_csv('student-mat.csv', sep=';')
+df_stud2 = pd.read_csv('student-por.csv', sep=';')
+df_students = pd.concat([df_stud1, df_stud2], axis=0)
 
-
-
-df_stud1=pd.read_csv('student-mat.csv',sep=';')
-#print(df_stud1.info())
-
-df_stud2=pd.read_csv('student-por.csv',sep=';')
-#print(df_stud2.info())
+male_data = df_students.query('sex=="M"')
+female_data = df_students.query('sex=="F"')
 
 df_students = pd.concat([df_stud1, df_stud2], axis=0)
-#df_students=df_stud1.merge(df_stud2, how='outer', on='school')
-#print(df_students.info())
-male_data=df_students.query('sex=="M"')
-female_data=df_students.query('sex=="F"')
+df_students_Join = df_stud1.merge(df_stud2,
+                                  on=["school", "sex", "age", "address", "famsize", "Pstatus", "Medu", "Fedu", "Mjob",
+                                      "Fjob", "reason", "nursery", "internet"])
+df_students.groupby(
+    ["school", "sex", "age", "address", "famsize", "Pstatus", "Medu", "Fedu", "Mjob", "Fjob", "reason", "nursery",
+     "internet"]).mean()
+df_students
 
-#sex_infos=df_students.groupby(by="age").mean()
-#print(sex_infos.head())
-fig=go.Figure()
+# --------------------------------------------------------------------------------------------------------------#
 
-fig.add_trace(go.Bar(x=male_data['age'], y=male_data['G1'], name='male'))
-fig.add_trace(go.Bar(x=female_data['age'], y=female_data['G1'], name='female'))
+# A- the impact of study time and free time on studdent performance
+df_SF_Time = df_students.loc[:, ["studytime", "failures", "G1", "G2", "G3"]]
+df_SF_Time["Grade"] = round((df_SF_Time["G1"] + df_SF_Time["G2"] + df_SF_Time["G3"]) / 3, 2)
+df_SF_Time = df_SF_Time.loc[:, ["studytime", "failures", "Grade"]]
+df_SF_Time=(df_SF_Time.groupby(["Grade","studytime","failures"]).size()
+          .sort_values(ascending=False)
+          .reset_index(name='Number of Students'))
+df_SF_Time=df_SF_Time.sort_values(by=["studytime","failures","Number of Students","Grade"])
+df_SF_Time
 
-df_totalG1=df_students.groupby(by='age').sum()
-annot =[dict(
-    x=xi,
-    y=yi,
-    text=str(yi),
-    xanchor='auto',
-    yanchor='bottom',
-    showarrow=False
-) for xi, yi in zip(df_totalG1.index, df_totalG1['G1'])]
+fig0 = px.scatter(df_SF_Time,x= "Grade", y = "Number of Students", color = "failures", facet_col = "studytime",color_continuous_scale="deep_r")
 
-fig.update_layout(barmode='stack', annotations=annot)
-fig.show()
+# --------------------------------------------------------------------------------------------------------------#
+# B- the effect of having family, School support and Private classes on performance of students
+df_support = df_students.loc[:, ["schoolsup", "famsup", "paid", "G1", "G2", "G3"]]
+df_support["Grade"] = round((df_support["G1"] + df_support["G2"] + df_support["G3"]) / 3, 2)
+df_support = df_support.loc[:, ["schoolsup", "famsup", "paid", "Grade"]]
+df_support["schoolsup"] = df_support.schoolsup.map(dict(yes=1, no=0))
+df_support["famsup"] = df_support.famsup.map(dict(yes=1, no=0))
+df_support["paid"] = df_support.paid.map(dict(yes=1, no=0))
+df_support["support"] = df_support['schoolsup'].astype(str) + df_support['famsup'].astype(str) + df_support[
+    'paid'].astype(str)
+df_support = df_support.sort_values(by=["support"])
+df_support["support"] = df_support.support.replace({'000': 'No support',
+                                                    '001': 'Private classes',
+                                                    '010': 'Family',
+                                                    '100': 'School',
+                                                    '011': 'Family & Private classes',
+                                                    '110': 'School & Family',
+                                                    '101': 'School & Private classes',
+                                                    '111': 'School & Family & Private classes'})
+df_support = (df_support.groupby(["support", "Grade"]).size()
+              .sort_values(ascending=False)
+              .reset_index(name='Number of Students'))
+df_support = df_support.sort_values(by=["Grade"])
 
+# --------------------------------------------------------------------------------------------------------------#
 
-#fig = px.treemap(df.sort_values(by="position", ascending=True).head(20), path=['country','city'], values='total score')
-#fig.update_traces(root_color="lightgrey")
+# 7-the effect of studying and having internet access on th performance
+df_SI_Time = df_students.loc[:, ["studytime", "internet", "G1", "G2", "G3"]]
+df_SI_Time["Grade"] = round((df_SI_Time["G1"] + df_SI_Time["G2"] + df_SI_Time["G3"]) / 3, 2)
+df_SI_Time = df_SI_Time.loc[:, [ "internet","studytime", "Grade"]]
+df_SI_Time = (df_SI_Time.groupby(["internet","studytime", "Grade"]).size()
+              .sort_values(ascending=False)
+              .reset_index(name='Number of Students'))
+df_SI_Time = df_SI_Time.sort_values(by=["internet","Number of Students", "Grade"])
+fig2 = px.histogram(df_SI_Time, y="Number of Students", x="Grade", color="internet",facet_col="studytime")
 
+# Application  Dash
+app = Dash(__name__)
 app.layout = html.Div(children=[
+
     html.H1(children='Presentation'),
 
     html.Div(children='''
-        Blahblah
     '''),
 
     dcc.Graph(
-        id='example-graph',
-        figure=fig
+        id='SF_Time',
+        figure=fig0
     ),
-    html.Div(children='''
-        presentation 2
-    '''),
+    html.Div(children=[
+        html.H4("Supporter 1"),
+        dcc.Dropdown(sorted(df_support['support'].unique()), "Family", id='support_drop')
+
+    ], style={'width': '48%', 'display': 'inline-block'}),
+    html.Div(children=[
+        html.H4("Supporter 2"),
+        dcc.Dropdown(sorted(df_support['support'].unique()), "School", id='support_drop1')
+
+    ], style={'width': '48%', 'display': 'inline-block'}),
+
+    dcc.Graph(id='ScFmPa_S_Time'),
 
     dcc.Graph(
-        id='example-graph',
-        #figure=fig2
-    )
-
+        id='SI_Performance',
+        figure=fig2
+    ),
 ])
 
+
+@app.callback(
+    Output(component_id='ScFmPa_S_Time', component_property='figure'),
+    Input(component_id='support_drop', component_property='value'),
+    Input(component_id='support_drop1', component_property='value'))
+def update_graph(support_drop, support_drop1):
+    df = df_support[(df_support['support'] == support_drop) | (df_support['support'] == support_drop1)]
+    fig = px.line(df, y="Number of Students", x="Grade", color=df_support.columns[0])
+    return fig
 
 
 if __name__ == '__main__':
     app.run_server(debug=True)
-
-
-
-
