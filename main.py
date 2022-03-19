@@ -86,6 +86,7 @@ df_gender_ages=df_gender_ages.sort_values(by=["Grade","#Students"])
 
 # Application  Dash
 app = Dash(__name__)
+server=app.server
 app.layout = html.Div(children=[
 
     html.H1(children='Student Performance'),
