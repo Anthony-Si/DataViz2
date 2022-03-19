@@ -75,6 +75,15 @@ df_support = (df_support.groupby(["support", "Grade"]).size()
 df_support = df_support.sort_values(by=["Grade"])
 
 # --------------------------------------------------------------------------------------------------------------#
+#2- the performance level difference between genders an ages
+df_gender_ages=df_students.loc[:,["sex","age","G1","G2","G3"]]
+df_gender_ages["Grade"]=round((df_gender_ages["G1"]+df_gender_ages["G2"]+df_gender_ages["G3"])/3,2)
+df_gender_ages=df_gender_ages.loc[:,["sex","age","Grade"]]
+# F is 1 and M is 0
+df_gender_ages["sex"]=df_gender_ages.sex.map(dict(F=1, M=0))
+df_gender_ages.sort_values(by=["age","Grade"])
+
+
 
 
 # Application  Dash
@@ -103,6 +112,7 @@ app.layout = html.Div(children=[
     ], style={'width': '48%', 'display': 'inline-block'}),
 
     dcc.Graph(id='ScFmPa_S_Time'),
+    dcc.Graph(id='Male-Female', figure=fig2)
 
 ])
 
