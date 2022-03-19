@@ -24,31 +24,31 @@ df_students.groupby(
      "internet"]).mean()
 df_students
 
-
 # --------------------------------------------------------------------------------------------------------------#
-# A- the effect of studying and having internet access on th performance
+# A- The effect of Studying Time and having Internet access on th performance of the Students
 df_SI_Time = df_students.loc[:, ["studytime", "internet", "G1", "G2", "G3"]]
 df_SI_Time["Grade"] = round((df_SI_Time["G1"] + df_SI_Time["G2"] + df_SI_Time["G3"]) / 3, 2)
-df_SI_Time = df_SI_Time.loc[:, [ "internet","studytime", "Grade"]]
-df_SI_Time = (df_SI_Time.groupby(["internet","studytime", "Grade"]).size()
+df_SI_Time = df_SI_Time.loc[:, ["internet", "studytime", "Grade"]]
+df_SI_Time = (df_SI_Time.groupby(["internet", "studytime", "Grade"]).size()
               .sort_values(ascending=False)
               .reset_index(name='Number of Students'))
-df_SI_Time = df_SI_Time.sort_values(by=["internet","Number of Students", "Grade"])
-fig0 = px.histogram(df_SI_Time, y="Number of Students", x="Grade", color="internet",facet_col="studytime")
-
+df_SI_Time = df_SI_Time.sort_values(by=["studytime"])
+fig0 = px.histogram(df_SI_Time, y="Number of Students", x="Grade", color="internet", facet_col="studytime")
+fig0.update_layout(title_text='The effect of Studying Time and having Internet access on th performance of the Students', title_x=0.5,margin=dict(t=100))
 # --------------------------------------------------------------------------------------------------------------#
 
 # B - the impact of study time and free time on studdent performance
 df_SF_Time = df_students.loc[:, ["studytime", "failures", "G1", "G2", "G3"]]
 df_SF_Time["Grade"] = round((df_SF_Time["G1"] + df_SF_Time["G2"] + df_SF_Time["G3"]) / 3, 2)
 df_SF_Time = df_SF_Time.loc[:, ["studytime", "failures", "Grade"]]
-df_SF_Time=(df_SF_Time.groupby(["Grade","studytime","failures"]).size()
-          .sort_values(ascending=False)
-          .reset_index(name='Number of Students'))
-df_SF_Time=df_SF_Time.sort_values(by=["studytime","failures","Number of Students","Grade"])
+df_SF_Time = (df_SF_Time.groupby(["studytime", "failures", "Grade"]).size()
+              .sort_values(ascending=False)
+              .reset_index(name='Number of Students'))
+df_SF_Time = df_SF_Time.sort_values(by=["studytime", "failures", "Number of Students", "Grade"])
 df_SF_Time
 
-fig1= px.scatter(df_SF_Time,x= "Grade", y = "Number of Students", color = "failures", facet_col = "studytime",color_continuous_scale="deep_r")
+fig1 = px.scatter(df_SF_Time, x="Grade", y="Number of Students", color="failures", facet_col="studytime",
+                  color_continuous_scale="deep_r")
 
 # --------------------------------------------------------------------------------------------------------------#
 # H- the effect of having family, School support and Private classes on performance of students
@@ -77,20 +77,17 @@ df_support = df_support.sort_values(by=["Grade"])
 # --------------------------------------------------------------------------------------------------------------#
 
 
-
 # Application  Dash
 app = Dash(__name__)
 app.layout = html.Div(children=[
 
     html.H1(children='Student Performance'),
 
-    html.Div(children='''
-    '''),
+    html.Div(children=[
+        dcc.Graph(id='SF_Time',
+                  figure=fig0)
+    ]),
 
-    dcc.Graph(
-        id='SF_Time',
-        figure=fig0
-    ),
     html.Div(children=[
         html.H4("Supporter 1"),
         dcc.Dropdown(sorted(df_support['support'].unique()), "Family", id='support_drop')
@@ -106,7 +103,6 @@ app.layout = html.Div(children=[
         figure=fig1
     ),
     dcc.Graph(id='ScFmPa_S_Time'),
-
 
 ])
 
