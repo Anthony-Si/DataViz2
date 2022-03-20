@@ -54,6 +54,19 @@ fig1 = px.scatter(df_SF_Time, x="Grade", y="Number of Students", color="failures
                   color_continuous_scale="deep_r")
 fig1.update_layout(title_text='The impact of study time on the number of past class Failures',
                    title_x=0.5, margin=dict(t=100))
+
+# --------------------------------------------------------------------------------------------------------------#
+
+# C - The effect of going out and use of alchohol on students performance Grades
+df_GoOut_Alcohol = df_students.loc[:, ["Dalc", "Walc", "goout", "failures", "G1", "G2", "G3"]]
+df_GoOut_Alcohol["Grade"] = round((df_GoOut_Alcohol["G1"] + df_GoOut_Alcohol["G2"] + df_GoOut_Alcohol["G3"]) / 3, 2)
+df_GoOut_Alcohol = df_GoOut_Alcohol.loc[:, ["Dalc", "Walc", "goout", "failures", "Grade"]]
+df_GoOut_Alcohol = (df_GoOut_Alcohol.groupby(["Dalc", "Walc", "goout", "failures", "Grade"]).size()
+              .sort_values(ascending=False)
+              .reset_index(name='Number of Students'))
+df_GoOut_Alcohol = df_GoOut_Alcohol.sort_values(by=["Dalc", "Walc", "goout", "failures", "Number of Students", "Grade"])
+df_GoOut_Alcohol
+
 # --------------------------------------------------------------------------------------------------------------#
 # H- the effect of having family, School support and Private classes on performance of students
 df_support = df_students.loc[:, ["schoolsup", "famsup", "paid", "G1", "G2", "G3"]]
