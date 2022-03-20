@@ -84,11 +84,6 @@ fig1.add_annotation(
 # C - The effect of going out and use of alchohol on students performance Grades
 df_GoOut_Alcohol = df_students.loc[:, ["Dalc", "Walc", "goout", "failures", "G1", "G2", "G3"]]
 df_GoOut_Alcohol["Grade"] = round((df_GoOut_Alcohol["G1"] + df_GoOut_Alcohol["G2"] + df_GoOut_Alcohol["G3"]) / 3, 2)
-# df_GoOut_Alcohol = df_GoOut_Alcohol.loc[:, ["Dalc", "Walc", "goout", "failures", "Grade"]]
-# df_GoOut_Alcohol = (df_GoOut_Alcohol.groupby(["Dalc", "Walc", "goout", "failures", "Grade"]).size()
-#                     .sort_values(ascending=False)
-#                     .reset_index(name='Number of Students'))
-# df_GoOut_Alcohol = df_GoOut_Alcohol.sort_values(by=["Dalc", "Walc", "goout", "failures", "Number of Students", "Grade"])
 df_GoOut_Alcohol["Grade_appreciation"]=0
 df_GoOut_Alcohol["Grade_appreciation"]=df_GoOut_Alcohol["Grade_appreciation"].mask(df_GoOut_Alcohol["Grade"]<8,"less than 8")
 df_GoOut_Alcohol["Grade_appreciation"]=df_GoOut_Alcohol["Grade_appreciation"].mask((df_GoOut_Alcohol["Grade"]>=8) & (df_GoOut_Alcohol["Grade"]<13),"between 8 and 12")
@@ -108,17 +103,8 @@ df_GoOut_Alcohol = (df_GoOut_Alcohol.groupby(["goout_Def", "Grade_appreciation",
               .sort_values(ascending=False)
               .reset_index(name='Number of Students'))
 df_GoOut_Alcohol.sort_values(by=["goout_Def", "Number of Students", "Grade_appreciation","Alcohol_General_Consumption"])
-df_GoOut_Alcohol
-# fig2 = px.scatter(df_GoOut_Alcohol, x="Grade", y="Number of Students", color="goout", facet_col="Walc",
-fig2 =  px.treemap(df_GoOut_Alcohol, path=['Alcohol_General_Consumption', 'goout_Def', 'Grade_appreciation', 'Grade'], values='Number of Students',
-           color='Grade', hover_data=['Grade'],
-           color_continuous_scale='thermal',
-           color_continuous_midpoint=np.average(df_GoOut_Alcohol['Grade'], weights=df_GoOut_Alcohol['Number of Students']))
+#df_GoOut_Alcohol
 
-#fig2 = px.pie(df_GoOut_Alcohol, values='Grade', names='goout_Def', hole=.3)
-fig2.update_layout(title_text='<SPAN STYLE="text-decoration:underline">'
-                              '<b>The effect of going out and use of alchohol on students performance Grades</b>'
-                              '</SPAN> ', title_x=0.5, margin=dict(t=100, b=100))
 
 
 
@@ -209,10 +195,24 @@ app.layout = html.Div(children=[
         id='SI_Performance',
         figure=fig1
     ),
-    dcc.Graph(
-        id='GA_Performance',
-        figure=fig2
+    html.P("FilterBy:"),
+    # dcc.Dropdown(id='FilterT',
+    #     options=['smoker', 'day', 'time', 'sex'],
+    #     value='day', clearable=False
+    # ),
+    dcc.Checklist(
+        id='CbxAlcGout',
+        options=[
+           {'label': 'Alcohol consumption (on daily basis)', 'value': 'Alcohol_General_Consumption'},
+           {'label': 'Going out', 'value': 'goout_Def'}
+        ],
+        value=['Alcohol_General_Consumption', 'goout_Def']
     ),
+    dcc.Graph(id="GA_Performance"),
+    # dcc.Graph(
+    #     id='GA_Performance',
+    #     figure=fig2
+    # ),
     html.Div(children=[
         html.H4("Supporter 1"),
         dcc.Dropdown(sorted(df_support['support'].unique()), "Family", id='support_drop')
@@ -380,6 +380,26 @@ def update_graph_2(slider_Medu, slider_Mjob, slider_Fedu, slider_Fjob):
     )
     return fig_t
 
+#C- Section going out and alcohol consumption impact on performance
+@app.callback(
+    Output(component_id='GA_Performance', component_property='figure'),
+    Input(component_id='CbxAlcGout', component_property='value'))
+def update_graph(CbxAlcGout):
+    if CbxAlcGout is None:
+        pathFig=["Alcohol_General_Consumption"]
+    pathFig=[*CbxAlcGout, 'Grade_appreciation','Grade']
+    fig = px.treemap(df_GoOut_Alcohol,
+                      path=pathFig,
+                      values='Number of Students',
+                      color='Grade', #hover_data=['Number of Students'],
+                      color_continuous_scale='plasma',
+                      color_continuous_midpoint=np.average(df_GoOut_Alcohol['Grade'],
+                                                           weights=df_GoOut_Alcohol['Number of Students']))
+    fig.update_layout(title_text='<SPAN STYLE="text-decoration:underline">'
+                                  '<b>The effect of going out and use of alchohol on students performance Grades</b>'
+                                  '</SPAN> ', title_x=0.5, margin=dict(t=100, b=100))
+
+    return fig
 
 if __name__ == '__main__':
     app.run_server(debug=True)
