@@ -85,7 +85,8 @@ df_gender_ages = (df_gender_ages.groupby(["sex","age","Grade"]).size()
 df_gender_ages=df_gender_ages.sort_values(by=["Grade","#Students"])
 
 # Application  Dash
-app = Dash(__name__)
+external_stylesheets=['https://codepen.io/chriddyp/pen/bWLwgP.css']
+app = Dash(__name__, external_stylesheets=external_stylesheets)
 server=app.server
 app.layout = html.Div(children=[
 
