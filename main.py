@@ -123,8 +123,9 @@ df_S_bkgrd_MF
 
 
 # Application  Dash
+#external_stylesheets=['https://codepen.io/chriddyp/pen/bWLwgP.css']
 app = Dash(__name__)
-server = app.server
+server=app.server
 app.layout = html.Div(children=[
 
     html.H1(children='Student Performance'),
@@ -138,12 +139,12 @@ app.layout = html.Div(children=[
         figure=fig1
     ),
     html.Div(children=[
-        html.H4("Supporter 1"),
+        html.H6("Supporter 1"),
         dcc.Dropdown(sorted(df_support['support'].unique()), "Family", id='support_drop')
 
     ], style={'width': '48%', 'display': 'inline-block'}),
     html.Div(children=[
-        html.H4("Supporter 2"),
+        html.H6("Supporter 2"),
         dcc.Dropdown(sorted(df_support['support'].unique()), "School", id='support_drop1')
 
     ], style={'width': '48%', 'display': 'inline-block'}),
@@ -151,19 +152,19 @@ app.layout = html.Div(children=[
     dcc.Graph(id='ScFmPa_S_Time'),
 
     html.Div(children=[
-        html.H4("From Age"),
+        html.H6("From Age"),
         dcc.Dropdown(sorted(df_gender_ages['age'].unique()), 15, id='age_drop')
 
     ], style={'width': '48%', 'display': 'inline-block'}),
     html.Div(children=[
-        html.H4("To Age"),
+        html.H6("To Age"),
         dcc.Dropdown(sorted(df_gender_ages['age'].unique()), 15, id='age_drop_1')
 
     ], style={'width': '48%', 'display': 'inline-block'}),
     dcc.Graph(id='Sex_Age_Grades'),
 
     html.Div(children=[
-    html.H4("Mother Education"),
+    html.H6("Mother Education"),
     dcc.Slider(0, 4,
                step=None,
                id='slider_Medu',
@@ -175,7 +176,7 @@ app.layout = html.Div(children=[
                value=4
                )],style={'width': '50%', 'display': 'inline-block'}),
     html.Div(children=[
-        html.H4("Mother Job"),
+        html.H6("Mother Job"),
         dcc.Slider(0, 4,
                    step=None,
                    id='slider_Mjob',
@@ -187,7 +188,7 @@ app.layout = html.Div(children=[
                    value=4
                    )], style={'width': '50%', 'display': 'inline-block'}),
     html.Div(children=[
-        html.H4("Father Education"),
+        html.H6("Father Education"),
         dcc.Slider(0, 4,
                    step=None,
                    id='slider_Fedu',
@@ -199,7 +200,7 @@ app.layout = html.Div(children=[
                    value=4
                    )], style={'width': '50%', 'display': 'inline-block'}),
     html.Div(children=[
-    html.H4("Father Job"),
+    html.H6("Father Job"),
     dcc.Slider(0, 4,
                step=None,
                id='slider_Fjob',
@@ -263,7 +264,6 @@ def update_graph_2(slider_Medu, slider_Mjob,slider_Fedu, slider_Fjob):
         title_text='The effect of Mother and Father background on Grades & Number of students aiming for higher education',
         title_x=0.5, margin=dict(t=100))
     return fig_t
-
 
 if __name__ == '__main__':
     app.run_server(debug=True)
