@@ -84,16 +84,44 @@ fig1.add_annotation(
 # C - The effect of going out and use of alchohol on students performance Grades
 df_GoOut_Alcohol = df_students.loc[:, ["Dalc", "Walc", "goout", "failures", "G1", "G2", "G3"]]
 df_GoOut_Alcohol["Grade"] = round((df_GoOut_Alcohol["G1"] + df_GoOut_Alcohol["G2"] + df_GoOut_Alcohol["G3"]) / 3, 2)
-df_GoOut_Alcohol = df_GoOut_Alcohol.loc[:, ["Dalc", "Walc", "goout", "failures", "Grade"]]
-df_GoOut_Alcohol = (df_GoOut_Alcohol.groupby(["Dalc", "Walc", "goout", "failures", "Grade"]).size()
-                    .sort_values(ascending=False)
-                    .reset_index(name='Number of Students'))
-df_GoOut_Alcohol = df_GoOut_Alcohol.sort_values(by=["Dalc", "Walc", "goout", "failures", "Number of Students", "Grade"])
+# df_GoOut_Alcohol = df_GoOut_Alcohol.loc[:, ["Dalc", "Walc", "goout", "failures", "Grade"]]
+# df_GoOut_Alcohol = (df_GoOut_Alcohol.groupby(["Dalc", "Walc", "goout", "failures", "Grade"]).size()
+#                     .sort_values(ascending=False)
+#                     .reset_index(name='Number of Students'))
+# df_GoOut_Alcohol = df_GoOut_Alcohol.sort_values(by=["Dalc", "Walc", "goout", "failures", "Number of Students", "Grade"])
+df_GoOut_Alcohol["Grade_appreciation"]=0
+df_GoOut_Alcohol["Grade_appreciation"]=df_GoOut_Alcohol["Grade_appreciation"].mask(df_GoOut_Alcohol["Grade"]<8,"less than 8")
+df_GoOut_Alcohol["Grade_appreciation"]=df_GoOut_Alcohol["Grade_appreciation"].mask((df_GoOut_Alcohol["Grade"]>=8) & (df_GoOut_Alcohol["Grade"]<13),"between 8 and 12")
+df_GoOut_Alcohol["Grade_appreciation"]=df_GoOut_Alcohol["Grade_appreciation"].mask(df_GoOut_Alcohol["Grade"]>=13,"over 13")
+df_GoOut_Alcohol["Alcohol"]=round((df_GoOut_Alcohol["Dalc"]+df_GoOut_Alcohol["Walc"])/2,0)
+df_GoOut_Alcohol["Alcohol_General_Consumption"]=df_GoOut_Alcohol.Alcohol.map({1: 'very low consumption of alcohol',
+                                           2: 'low consumption of alcohol',
+                                           3: 'medium consumption of alcohol',
+                                           4: 'high consumption of alcohol',
+                                           5: 'very high consumption of alcohol'})
+df_GoOut_Alcohol["goout_Def"]=df_GoOut_Alcohol.Alcohol.map({1: 'go out very rarely',
+                                           2: 'go out rarely',
+                                           3: 'go out sometime',
+                                           4: 'go out often',
+                                           5: 'go out a lot'})
+df_GoOut_Alcohol = (df_GoOut_Alcohol.groupby(["goout_Def", "Grade_appreciation","Grade","Alcohol_General_Consumption"]).size()
+              .sort_values(ascending=False)
+              .reset_index(name='Number of Students'))
+df_GoOut_Alcohol.sort_values(by=["goout_Def", "Number of Students", "Grade_appreciation","Alcohol_General_Consumption"])
 df_GoOut_Alcohol
-fig2 = px.scatter(df_GoOut_Alcohol, x="Grade", y="Number of Students", color="goout", facet_col="Walc",
-                  color_continuous_scale="deep_r")
-fig2.update_layout(title_text='The effect of going out and use of alchohol on students performance Grades',
-                   title_x=0.5, margin=dict(t=100))
+# fig2 = px.scatter(df_GoOut_Alcohol, x="Grade", y="Number of Students", color="goout", facet_col="Walc",
+fig2 =  px.treemap(df_GoOut_Alcohol, path=['Alcohol_General_Consumption', 'goout_Def', 'Grade_appreciation', 'Grade'], values='Number of Students',
+           color='Grade', hover_data=['Grade'],
+           color_continuous_scale='thermal',
+           color_continuous_midpoint=np.average(df_GoOut_Alcohol['Grade'], weights=df_GoOut_Alcohol['Number of Students']))
+
+#fig2 = px.pie(df_GoOut_Alcohol, values='Grade', names='goout_Def', hole=.3)
+fig2.update_layout(title_text='<SPAN STYLE="text-decoration:underline">'
+                              '<b>The effect of going out and use of alchohol on students performance Grades</b>'
+                              '</SPAN> ', title_x=0.5, margin=dict(t=100, b=100))
+
+
+
 # --------------------------------------------------------------------------------------------------------------#
 # H- the effect of having family, School support and Private classes on performance of students
 df_support = df_students.loc[:, ["schoolsup", "famsup", "paid", "G1", "G2", "G3"]]
