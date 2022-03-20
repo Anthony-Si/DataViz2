@@ -66,7 +66,10 @@ df_GoOut_Alcohol = (df_GoOut_Alcohol.groupby(["Dalc", "Walc", "goout", "failures
               .reset_index(name='Number of Students'))
 df_GoOut_Alcohol = df_GoOut_Alcohol.sort_values(by=["Dalc", "Walc", "goout", "failures", "Number of Students", "Grade"])
 df_GoOut_Alcohol
-
+fig2 = px.scatter(df_GoOut_Alcohol, x="Grade", y="Number of Students", color="goout", facet_col="Walc",
+                  color_continuous_scale="deep_r")
+fig2.update_layout(title_text='The effect of going out and use of alchohol on students performance Grades',
+                   title_x=0.5, margin=dict(t=100))
 # --------------------------------------------------------------------------------------------------------------#
 # H- the effect of having family, School support and Private classes on performance of students
 df_support = df_students.loc[:, ["schoolsup", "famsup", "paid", "G1", "G2", "G3"]]
@@ -152,6 +155,10 @@ app.layout = html.Div(children=[
     dcc.Graph(
         id='SI_Performance',
         figure=fig1
+    ),
+    dcc.Graph(
+        id='GA_Performance',
+        figure=fig2
     ),
     html.Div(children=[
         html.H4("Supporter 1"),
