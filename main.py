@@ -36,8 +36,21 @@ df_SI_Time = df_SI_Time.sort_values(by=["studytime"])
 fig0 = px.histogram(df_SI_Time, y="Number of Students", x="Grade", color="internet", facet_col="studytime",
                     category_orders={"internet": ["yes", "no"]},
                     color_discrete_map={"yes": "#19D3F3", "no": "#2E91E5"})
-fig0.update_layout(title_text='The effect of Studying Time and having Internet access on the performance of the '
-                              'Students', title_x=0.5, margin=dict(t=100))
+fig0.update_layout(title_text='<SPAN STYLE="text-decoration:underline">'
+                              '<b>The effect of Studying Time and having Internet access on the performance of the '
+                              'Students</b>'
+                              '</SPAN> ', title_x=0.5, margin=dict(t=100, b=100))
+fig0.add_annotation(
+    x=0.5, y=-0.35,
+    text="We can see that Studying while having Internet Access can affect badly the performance(grades) of "
+         "students.",
+    font_size=15,
+    xref="paper", yref="paper",
+    showarrow=False,
+    bordercolor='red',
+    borderpad=10
+)
+
 # --------------------------------------------------------------------------------------------------------------#
 
 # B - the impact of study time and free time on studdent performance
@@ -52,8 +65,19 @@ df_SF_Time
 
 fig1 = px.scatter(df_SF_Time, x="Grade", y="Number of Students", color="failures", facet_col="studytime",
                   color_continuous_scale="deep_r")
-fig1.update_layout(title_text='The impact of study time on the number of past class Failures',
-                   title_x=0.5, margin=dict(t=100))
+
+fig1.update_layout(title_text='<SPAN STYLE="text-decoration:underline">'
+                              '<b>The impact of study time on the number of past class Failures</b>'
+                              '</SPAN> ', title_x=0.5, margin=dict(t=100, b=100))
+fig1.add_annotation(
+    x=0.5, y=-0.35,
+    text="We can see that Studying time can drastically decrease the number of failures a student can have.",
+    font_size=15,
+    xref="paper", yref="paper",
+    showarrow=False,
+    bordercolor='red',
+    borderpad=10
+)
 
 # --------------------------------------------------------------------------------------------------------------#
 
@@ -62,8 +86,8 @@ df_GoOut_Alcohol = df_students.loc[:, ["Dalc", "Walc", "goout", "failures", "G1"
 df_GoOut_Alcohol["Grade"] = round((df_GoOut_Alcohol["G1"] + df_GoOut_Alcohol["G2"] + df_GoOut_Alcohol["G3"]) / 3, 2)
 df_GoOut_Alcohol = df_GoOut_Alcohol.loc[:, ["Dalc", "Walc", "goout", "failures", "Grade"]]
 df_GoOut_Alcohol = (df_GoOut_Alcohol.groupby(["Dalc", "Walc", "goout", "failures", "Grade"]).size()
-              .sort_values(ascending=False)
-              .reset_index(name='Number of Students'))
+                    .sort_values(ascending=False)
+                    .reset_index(name='Number of Students'))
 df_GoOut_Alcohol = df_GoOut_Alcohol.sort_values(by=["Dalc", "Walc", "goout", "failures", "Number of Students", "Grade"])
 df_GoOut_Alcohol
 fig2 = px.scatter(df_GoOut_Alcohol, x="Grade", y="Number of Students", color="goout", facet_col="Walc",
@@ -150,7 +174,8 @@ app.layout = html.Div(children=[
 
     html.Div(children=[
         dcc.Graph(id='SF_Time',
-                  figure=fig0)
+                  figure=fig0,
+                  )
     ]),
     dcc.Graph(
         id='SI_Performance',
@@ -164,12 +189,13 @@ app.layout = html.Div(children=[
         html.H4("Supporter 1"),
         dcc.Dropdown(sorted(df_support['support'].unique()), "Family", id='support_drop')
 
-    ], style={'width': '48%', 'display': 'inline-block'}),
+    ], style={'width': '30%', 'display': 'inline-block'}),
+    html.Div(style={'width': '5%', 'display': 'inline-block'}),
     html.Div(children=[
         html.H4("Supporter 2"),
         dcc.Dropdown(sorted(df_support['support'].unique()), "School", id='support_drop1')
 
-    ], style={'width': '48%', 'display': 'inline-block'}),
+    ], style={'width': '30%', 'display': 'inline-block'}),
 
     dcc.Graph(id='ScFmPa_S_Time'),
 
@@ -177,12 +203,13 @@ app.layout = html.Div(children=[
         html.H4("From Age"),
         dcc.Dropdown(sorted(df_gender_ages['age'].unique()), 15, id='age_drop')
 
-    ], style={'width': '48%', 'display': 'inline-block'}),
+    ], style={'width': '20%', 'display': 'inline-block'}),
+    html.Div(style={'width': '5%', 'display': 'inline-block'}),
     html.Div(children=[
         html.H4("To Age"),
         dcc.Dropdown(sorted(df_gender_ages['age'].unique()), 15, id='age_drop_1')
 
-    ], style={'width': '48%', 'display': 'inline-block'}),
+    ], style={'width': '20%', 'display': 'inline-block'}),
     dcc.Graph(id='Sex_Age_Grades'),
 
     html.Div(children=[
@@ -195,7 +222,7 @@ app.layout = html.Div(children=[
                           2: 'Primary 5th -> 9th',
                           3: 'Secondary',
                           4: 'Higher'},
-                   value=4
+                   value=2
                    )], style={'width': '50%', 'display': 'inline-block'}),
     html.Div(children=[
         html.H4("Mother Job"),
@@ -207,7 +234,7 @@ app.layout = html.Div(children=[
                           2: 'Services',
                           3: 'At_home',
                           4: 'Other'},
-                   value=4
+                   value=1
                    )], style={'width': '50%', 'display': 'inline-block'}),
     html.Div(children=[
         html.H4("Father Education"),
@@ -219,7 +246,7 @@ app.layout = html.Div(children=[
                           2: 'Primary 5th -> 9th',
                           3: 'Secondary',
                           4: 'Higher'},
-                   value=4
+                   value=1
                    )], style={'width': '50%', 'display': 'inline-block'}),
     html.Div(children=[
         html.H4("Father Job"),
@@ -231,7 +258,7 @@ app.layout = html.Div(children=[
                           2: 'Services',
                           3: 'At_home',
                           4: 'Other'},
-                   value=4
+                   value=2
                    )], style={'width': '50%', 'display': 'inline-block'}),
     dcc.Graph(id='Medu_Mjob_Higher')
 
@@ -243,19 +270,28 @@ app.layout = html.Div(children=[
     Input(component_id='support_drop', component_property='value'),
     Input(component_id='support_drop1', component_property='value'))
 def update_graph(support_drop, support_drop1):
+    if support_drop is None:
+        support_drop="Family"
+    if support_drop1 is None:
+        support_drop1="School"
+
     df = df_support[(df_support['support'] == support_drop) | (df_support['support'] == support_drop1)]
     fig = px.line(df, y="Number of Students", x="Grade", color=df_support.columns[0],
-                  color_discrete_map={'No support':'#636EFA',
+                  color_discrete_map={'No support': '#636EFA',
                                       'Private classes': '#2CA02C',
                                       'Family': '#AB63FA',
                                       'School': '#17BECF',
-                                      'Family & Private classes':'#FF7F0E',
-                                      'School & Family':'#9D755D',
+                                      'Family & Private classes': '#FF7F0E',
+                                      'School & Family': '#9D755D',
                                       'School & Private classes': '#F32D0D',
-                                      'School & Family & Private classes':'#00CC96'})
+                                      'School & Family & Private classes': '#00CC96'})
     fig.update_layout(
-        title_text='The effect of having Family, School Support and Private Classes on Student Performance',
+        title_text='',
         title_x=0.5, margin=dict(t=100))
+    fig.update_layout(title_text='<SPAN STYLE="text-decoration:underline">'
+                                 '<b>The effect of having Family, School Support and Private Classes on Student Performance.</b>'
+                                 '</SPAN> ', title_x=0.5, margin=dict(t=100))
+
     return fig
 
 
@@ -264,19 +300,24 @@ def update_graph(support_drop, support_drop1):
     Input(component_id='age_drop', component_property='value'),
     Input(component_id='age_drop_1', component_property='value'))
 def update_graph_1(age_drop, age_drop_1):
+    if age_drop is None:
+        age_drop=15
+    if age_drop_1 is None:
+        age_drop_1=15
     if age_drop > age_drop_1:
         temp = age_drop
         age_drop = age_drop_1
         age_drop_1 = temp
+
     df = df_gender_ages[(df_gender_ages['age'] >= age_drop) & (df_gender_ages['age'] <= age_drop_1)]
     df = df.sort_values(by=["age"])
     fig_t = px.area(df, x="Grade", y="#Students", color='sex',
                     facet_row='sex', facet_col='age',
                     category_orders={"sex": ["M", "F"]},
                     color_discrete_map={"M": "#19D3F3", "F": "#FF6692"})
-    fig_t.update_layout(
-        title_text='Grades analysis between Genders and ages',
-        title_x=0.5, margin=dict(t=100))
+    fig_t.update_layout(title_text='<SPAN STYLE="text-decoration:underline">'
+                                   '<b>Grades analysis between Genders and Ages.</b>'
+                                   '</SPAN> ', title_x=0.5, margin=dict(t=100))
     return fig_t
 
 
@@ -295,9 +336,20 @@ def update_graph_2(slider_Medu, slider_Mjob, slider_Fedu, slider_Fjob):
                    color_discrete_map={  # replaces default color mapping by value
                        "yes": "#16FF32", "no": "#FB0D0D"
                    })
-    fig_t.update_layout(
-        title_text='The effect of Mother and Father background on Grades & Number of students aiming for higher education',
-        title_x=0.5, margin=dict(t=100))
+    fig_t.update_layout(title_text='<SPAN STYLE="text-decoration:underline">'
+                                   '<b>The effect of Mother & Father background on Grades & Number of students aiming '
+                                   'for higher education.</b> '
+                                   '</SPAN> ', title_x=0.5, margin=dict(t=100,b=100))
+    fig_t.add_annotation(
+        x=0.5, y=-0.35,
+        text="We can see that parents with higher educational background & social status have children that more likely "
+             "will aim for higher education .",
+        font_size=15,
+        xref="paper", yref="paper",
+        showarrow=False,
+        bordercolor='red',
+        borderpad=10
+    )
     return fig_t
 
 
