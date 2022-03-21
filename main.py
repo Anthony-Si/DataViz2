@@ -109,12 +109,12 @@ df_GoOut_Alcohol
 # D - The effect of alchohol on students health
 df_Alcohol_Health = df_students.loc[:, ["Dalc", "Walc", "health"]]
 df_Alcohol_Health["Alcohol"]=round((df_Alcohol_Health["Dalc"]+df_Alcohol_Health["Walc"])/2,0)
-# df_Alcohol_Health["Alcohol_General_Consumption"]=df_Alcohol_Health.Alcohol.map({1: 'very low consumption of alcohol',
-#                                            2: 'low consumption of alcohol',
-#                                            3: 'medium consumption of alcohol',
-#                                            4: 'high consumption of alcohol',
-#                                            5: 'very high consumption of alcohol'})
-df_Alcohol_Health = (df_Alcohol_Health.groupby(["Alcohol","health"]).size()
+df_Alcohol_Health["health_desc"]=df_Alcohol_Health.health.map({1: 'very bad condition of health',
+                                           2: 'bad condition of health',
+                                           3: 'medium condition of health',
+                                           4: 'good condition of health',
+                                           5: 'very good condition of health'})
+df_Alcohol_Health = (df_Alcohol_Health.groupby(["Alcohol","health_desc"]).size()
               .sort_values(ascending=False)
               .reset_index(name='Number of Students'))
 df_Alcohol_Health
@@ -155,6 +155,22 @@ df_gender_ages = (df_gender_ages.groupby(["sex", "age", "Grade"]).size()
                   .reset_index(name='#Students'))
 df_gender_ages = df_gender_ages.sort_values(by=["Grade", "#Students", "age"])
 
+
+# F- 8-the effect of travel time and reason on absences
+df_TT_Loc_Rsn=df_students.loc[:,["address", "traveltime","reason","absences","G1", "G2", "G3"]].sort_values(by=["reason","traveltime", "address","absences"])
+df_TT_Loc_Rsn["Grade"]=round((df_TT_Loc_Rsn["G1"]+df_TT_Loc_Rsn["G2"]+df_TT_Loc_Rsn["G3"])/3,0)
+df_TT_Loc_Rsn["Location"] = df_TT_Loc_Rsn.address.map({'R': 'Rural',
+                                           'U': 'Urban'})
+df_TT_Loc_Rsn["Trvl_Time"] = df_TT_Loc_Rsn.traveltime.map({1 : "<15 min",
+                                                       2 : "15 to 30 min",
+                                                       3 : "30 min to 1 hour",
+                                                       4 : ">1 hour"})
+#df_TT_Loc_Rsn.groupby(by=["Trvl_Time","reason","Location"]).mean().loc[:,["absences","Grade"]]
+
+
+
+
+
 # --------------------------------------------------------------------------------------------------------------#
 # 6-the effect of mother and father backgounrd(education and jobs) on student aiming for higher education
 df_S_bkgrd = df_students.loc[:, ["Medu", "Fedu", "Mjob", "Fjob", "higher", "G1", "G2", "G3"]]
@@ -191,6 +207,15 @@ df_S_bkgrd_MF = (df_S_bkgrd_MF.groupby(
 df_S_bkgrd_MF = df_S_bkgrd_MF.sort_values(by="Grade")
 df_S_bkgrd_MF
 
+
+#I -9 having a fullfied emotional needs ( family,relationship,extracurricular) effect on performance
+# df_EmtFll = df_students.loc[:, ["famsup", "romantic", "activities", "G1", "G2", "G3"]]
+# df_EmtFll["Grade"] = round((df_EmtFll["G1"] + df_EmtFll["G2"] + df_EmtFll["G3"]) / 3, 2)
+# df_EmtFll=df_students.groupby(by=["famsup","romantic","activities"],as_index=False).mean().loc[:,["famsup","romantic","activities","absences", "Grade"]]
+
+
+
+
 # Application  Dash
 # external_stylesheets=['https://codepen.io/chriddyp/pen/bWLwgP.css']
 app = Dash(__name__)
@@ -198,7 +223,8 @@ server = app.server
 app.layout = html.Div(children=[
 
     html.H1(children='Student Performance'),
-
+    html.H2(children='We chose to perform analysis the performances of students from 2 schools in Portugal. '
+                     'The aim of the following graphs is to highlight the different parameters having an impact on the grades (such as the family support, alcohol frequency of use,etc...)'),
     html.Div(children=[
         dcc.Graph(id='SF_Time',
                   figure=fig0,
@@ -238,7 +264,53 @@ app.layout = html.Div(children=[
                 inputStyle = {'margin-left':'20px'}
             ),
             dcc.Graph(id="Alc_Health")
-        ]),
+    ]),
+    html.Div(children=[
+            html.H4("Filter on:"),
+            dcc.RadioItems(
+               id='RbxTTRsn',
+               options=[
+                   {'label': 'Travel time', 'value': 'Trvl_Time'},
+                   {'label': 'Reason to attend the school', 'value': 'reason'},
+               ],
+               value='Trvl_Time',
+                inputStyle = {'margin-left':'20px'}
+            ),
+            dcc.Graph(id="TTLocRsn_absences")
+    ]),
+    # html.Div(children=[
+    #         html.H4("Family support:"),
+    #         dcc.RadioItems(
+    #            id='Rbxfmsp',
+    #            options=[
+    #                {'label': 'Yes', 'value': 'yes'},
+    #                {'label': 'No', 'value': 'no'},
+    #            ],
+    #            value='yes',
+    #             inputStyle = {'margin-left':'20px'}
+    #         ),
+    #         html.H4("In romance:"),
+    #         dcc.RadioItems(
+    #            id='Rbxrmtc',
+    #            options=[
+    #                {'label': 'Yes', 'value': 'yes'},
+    #                {'label': 'No', 'value': 'no'},
+    #            ],
+    #            value='yes',
+    #             inputStyle = {'margin-left':'20px'}
+    #         ),
+    #         html.H4("Extra curricular activities:"),
+    #         dcc.RadioItems(
+    #            id='Rbxxcrr',
+    #            options=[
+    #                {'label': 'Yes', 'value': 'yes'},
+    #                {'label': 'No', 'value': 'no'},
+    #            ],
+    #            value='yes',
+    #             inputStyle = {'margin-left':'20px'}
+    #         ),
+    #         dcc.Graph(id="EmtFlfllmnt_Perfs")
+    # ]),
     html.Div(children=[
         html.H4("Supporter 1"),
         dcc.Dropdown(sorted(df_support['support'].unique()), "Family", id='support_drop')
@@ -443,12 +515,8 @@ def update_graph_3(CbxAlcGout):
     Input(component_id='RbxAlcHealth', component_property='value'))
 def update_graph_4(RbxAlcHealth):
     df_AH=df_Alcohol_Health.query("Alcohol==" + str(int(RbxAlcHealth)))
-    df_AH.sort_values(by=["health", "Number of Students", "Alcohol"])
-    fig = px.pie(df_AH, values='Number of Students', names='health',hole=0.4, color_discrete_map={'1':'lightcyan',
-                                 '2':'cyan',
-                                 '3':'royalblue',
-                                 '4':'darkblue',
-                                 '5':'red'})
+    df_AH.sort_values(by=["health_desc", "Number of Students", "Alcohol"])
+    fig = px.pie(df_AH, values='Number of Students', names='health_desc',hole=0.4)
     fig.update_layout(title_text='<SPAN STYLE="text-decoration:underline">'
                                   '<b>The impact of alcohol use on students health</b>'
                                   '</SPAN> ', title_x=0.5, margin=dict(t=100))
@@ -465,6 +533,61 @@ def update_graph_4(RbxAlcHealth):
     #     borderpad=10
     # )
     return fig
+
+
+
+#F- Section impact of travel time, reason and location on absences
+@app.callback(
+    Output(component_id='TTLocRsn_absences', component_property='figure'),
+    Input(component_id='RbxTTRsn', component_property='value'))
+def update_graph_5(RbxTTRsn):
+    df_tmp=df_TT_Loc_Rsn.groupby(by=["Location", RbxTTRsn], as_index= False).sum()
+    df_tmp.sort_values(by=['absences', RbxTTRsn])
+    fig = px.funnel(df_tmp, x='absences', y=RbxTTRsn, color='Location')
+
+    fig.update_layout(title_text='<SPAN STYLE="text-decoration:underline">'
+                                  '<b>The impact of travel time, reason and location on students absences</b>'
+                                  '</SPAN> ', title_x=0.5, margin=dict(t=100))
+
+    #fig.update_layout(title_text='', title_x=0.5, margin=dict(t=100,b=100))
+    # fig.add_annotation(
+    #     x=0.5, y=-0.35,
+    #     text="The majority of good grades are gotten by the students who don't go out so often with their and also "
+    #          "don't drink alcohol or very little.",
+    #     font_size=15,
+    #     xref="paper", yref="paper",
+    #     showarrow=False,
+    #     bordercolor='red',
+    #     borderpad=10
+    # )
+    return fig
+
+#I- Section impact of emtional fulfillement on performances
+# @app.callback(
+#     Output(component_id='EmtFlfllmnt_Perfs', component_property='figure'),
+#     Input(component_id='Rbxfmsp', component_property='value'),
+#     Input(component_id='Rbxrmtc', component_property='value'),
+#     Input(component_id='Rbxxcrr', component_property='value'))
+# def update_graph_6(Rbxfmsp,Rbxrmtc,Rbxxcrr):
+#     df_EmtFll = df_EmtFll.query("famsup=='"+Rbxfmsp + "' & romantic=='"+Rbxrmtc + "' & activities=='"+Rbxxcrr+"'")
+#     fig = px.histogram(df_EmtFll, x='absences', y='Grade', color='Location')
+#
+#     fig.update_layout(title_text='<SPAN STYLE="text-decoration:underline">'
+#                                   '<b>The emotional fullfilment impact on Students performances and absences</b>'
+#                                   '</SPAN> ', title_x=0.5, margin=dict(t=100))
+
+    #fig.update_layout(title_text='', title_x=0.5, margin=dict(t=100,b=100))
+    # fig.add_annotation(
+    #     x=0.5, y=-0.35,
+    #     text="The majority of good grades are gotten by the students who don't go out so often with their and also "
+    #          "don't drink alcohol or very little.",
+    #     font_size=15,
+    #     xref="paper", yref="paper",
+    #     showarrow=False,
+    #     bordercolor='red',
+    #     borderpad=10
+    # )
+    # return fig
 
 if __name__ == '__main__':
     app.run_server(debug=True)
