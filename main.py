@@ -105,6 +105,19 @@ df_GoOut_Alcohol = (df_GoOut_Alcohol.groupby(["goout_Def", "Grade_appreciation",
 df_GoOut_Alcohol.sort_values(by=["goout_Def", "Number of Students", "Grade_appreciation","Alcohol_General_Consumption"])
 df_GoOut_Alcohol
 
+# --------------------------------------------------------------------------------------------------------------#
+# D - The effect of alchohol on students health
+df_Alcohol_Health = df_students.loc[:, ["Dalc", "Walc", "health"]]
+df_Alcohol_Health["Alcohol"]=round((df_Alcohol_Health["Dalc"]+df_Alcohol_Health["Walc"])/2,0)
+# df_Alcohol_Health["Alcohol_General_Consumption"]=df_Alcohol_Health.Alcohol.map({1: 'very low consumption of alcohol',
+#                                            2: 'low consumption of alcohol',
+#                                            3: 'medium consumption of alcohol',
+#                                            4: 'high consumption of alcohol',
+#                                            5: 'very high consumption of alcohol'})
+df_Alcohol_Health = (df_Alcohol_Health.groupby(["Alcohol","health"]).size()
+              .sort_values(ascending=False)
+              .reset_index(name='Number of Students'))
+df_Alcohol_Health
 
 
 
@@ -208,7 +221,21 @@ app.layout = html.Div(children=[
         ),
         dcc.Graph(id="GA_Performance")
     ]),
-
+    html.Div(children=[
+            html.H2("The effect of alchohol use on students health", style={"justify": "center", "text-decoration": "underline"}),
+            dcc.RadioItems(
+               id='RbxAlcHealth',
+               options=[
+                   {'label': 'very low consumption of alcohol', 'value': '1'},
+                   {'label': 'low consumption of alcohol', 'value': '2'},
+                   {'label': 'medium consumption of alcohol', 'value': '3'},
+                   {'label': 'high consumption of alcohol', 'value': '4'},
+                   {'label': 'very high consumption of alcohol', 'value': '5'},
+               ],
+               value='1'
+            ),
+            dcc.Graph(id="Alc_Health")
+        ]),
     html.Div(children=[
         html.H4("Supporter 1"),
         dcc.Dropdown(sorted(df_support['support'].unique()), "Family", id='support_drop')
@@ -405,6 +432,36 @@ def update_graph(CbxAlcGout):
         bordercolor='red',
         borderpad=10
     )
+    return fig
+
+
+#D- Section going out and alcohol consumption impact on performance
+@app.callback(
+    Output(component_id='Alc_Health', component_property='figure'),
+    Input(component_id='RbxAlcHealth', component_property='value'))
+def update_graph(RbxAlcHealth):
+    df_AH=df_Alcohol_Health.query("Alcohol==" + str(int(RbxAlcHealth)))
+    df_AH.sort_values(by=["health", "Number of Students", "Alcohol"])
+    fig = px.pie(df_AH, values='Number of Students', names='health',hole=0.4, color_discrete_map={'1':'lightcyan',
+                                 '2':'cyan',
+                                 '3':'royalblue',
+                                 '4':'darkblue',
+                                 '5':'red'})
+    # fig.update_layout(title_text='<SPAN STYLE="text-decoration:underline">'
+    #                               '<b>The impact of alcohol use on students health</b>'
+    #                               '</SPAN> ', title_x=0.5, margin=dict(t=100, b=100))
+
+    fig.update_layout(title_text='', title_x=0.5, margin=dict(t=100,b=100))
+    # fig.add_annotation(
+    #     x=0.5, y=-0.35,
+    #     text="The majority of good grades are gotten by the students who don't go out so often with their and also "
+    #          "don't drink alcohol or very little.",
+    #     font_size=15,
+    #     xref="paper", yref="paper",
+    #     showarrow=False,
+    #     bordercolor='red',
+    #     borderpad=10
+    # )
     return fig
 
 if __name__ == '__main__':
