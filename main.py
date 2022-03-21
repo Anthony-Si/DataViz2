@@ -220,8 +220,8 @@ server = app.server
 app.layout = html.Div(children=[
 
     html.H1(children='Student Performance'),
-    html.H2(children='We chose to perform analysis the performances of students from 2 schools in Portugal. '
-                     'The aim of the following graphs is to highlight the different parameters having an impact on the grades (such as the family support, alcohol frequency of use,etc...)'),
+    html.H2(children='We chose to perform analysis on the performances of students from 2 schools in Portugal. '
+                     'The aim of the following graphs is to highlight the different factors impact on the grades / performance (such as the family support, alcohol frequency of use,etc...)'),
     html.Div(children=[
         dcc.Graph(id='SF_Time',
                   figure=fig0,
