@@ -85,9 +85,9 @@ fig1.add_annotation(
 df_GoOut_Alcohol = df_students.loc[:, ["Dalc", "Walc", "goout", "failures", "G1", "G2", "G3"]]
 df_GoOut_Alcohol["Grade"] = round((df_GoOut_Alcohol["G1"] + df_GoOut_Alcohol["G2"] + df_GoOut_Alcohol["G3"]) / 3, 2)
 df_GoOut_Alcohol["Grade_appreciation"]=0
-df_GoOut_Alcohol["Grade_appreciation"]=df_GoOut_Alcohol["Grade_appreciation"].mask(df_GoOut_Alcohol["Grade"]<8,"less than 8")
-df_GoOut_Alcohol["Grade_appreciation"]=df_GoOut_Alcohol["Grade_appreciation"].mask((df_GoOut_Alcohol["Grade"]>=8) & (df_GoOut_Alcohol["Grade"]<13),"between 8 and 12")
-df_GoOut_Alcohol["Grade_appreciation"]=df_GoOut_Alcohol["Grade_appreciation"].mask(df_GoOut_Alcohol["Grade"]>=13,"over 13")
+df_GoOut_Alcohol["Grade_appreciation"]=df_GoOut_Alcohol["Grade_appreciation"].mask(df_GoOut_Alcohol["Grade"]<8,"grade less than 8")
+df_GoOut_Alcohol["Grade_appreciation"]=df_GoOut_Alcohol["Grade_appreciation"].mask((df_GoOut_Alcohol["Grade"]>=8) & (df_GoOut_Alcohol["Grade"]<13),"grade between 8 and 12")
+df_GoOut_Alcohol["Grade_appreciation"]=df_GoOut_Alcohol["Grade_appreciation"].mask(df_GoOut_Alcohol["Grade"]>=13,"grade over 13")
 df_GoOut_Alcohol["Alcohol"]=round((df_GoOut_Alcohol["Dalc"]+df_GoOut_Alcohol["Walc"])/2,0)
 df_GoOut_Alcohol["Alcohol_General_Consumption"]=df_GoOut_Alcohol.Alcohol.map({1: 'very low consumption of alcohol',
                                            2: 'low consumption of alcohol',
@@ -103,7 +103,7 @@ df_GoOut_Alcohol = (df_GoOut_Alcohol.groupby(["goout_Def", "Grade_appreciation",
               .sort_values(ascending=False)
               .reset_index(name='Number of Students'))
 df_GoOut_Alcohol.sort_values(by=["goout_Def", "Number of Students", "Grade_appreciation","Alcohol_General_Consumption"])
-#df_GoOut_Alcohol
+df_GoOut_Alcohol
 
 
 
