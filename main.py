@@ -209,20 +209,22 @@ app.layout = html.Div(children=[
         figure=fig1
     ),
     html.Div(children=[
-        html.H2("The effect of going out and use of alchohol on students performance Grades", style={"justify": "center", "text-decoration": "underline"}),
-        html.P("FilterBy:"),
+        #html.H2("The effect of going out and use of alchohol on students performance Grades", style={"justify": "center", "text-decoration": "underline"}),
+        html.H4("FilterBy:"),
         dcc.Checklist(
             id='CbxAlcGout',
             options=[
                {'label': 'Alcohol consumption (on daily basis)', 'value': 'Alcohol_General_Consumption'},
                {'label': 'Going out', 'value': 'goout_Def'}
             ],
-            value=['Alcohol_General_Consumption', 'goout_Def']
+            value=['Alcohol_General_Consumption', 'goout_Def'],
+            inputStyle = {'margin-left':'20px'}
         ),
         dcc.Graph(id="GA_Performance")
     ]),
     html.Div(children=[
-            html.H2("The effect of alchohol use on students health", style={"justify": "center", "text-decoration": "underline"}),
+            #html.H2("The effect of alchohol use on students health", style={"justify": "center", "text-decoration": "underline"}),
+            html.H4("FilterBy:"),
             dcc.RadioItems(
                id='RbxAlcHealth',
                options=[
@@ -232,7 +234,8 @@ app.layout = html.Div(children=[
                    {'label': 'high consumption of alcohol', 'value': '4'},
                    {'label': 'very high consumption of alcohol', 'value': '5'},
                ],
-               value='1'
+               value='1',
+                inputStyle = {'margin-left':'20px'}
             ),
             dcc.Graph(id="Alc_Health")
         ]),
@@ -407,7 +410,7 @@ def update_graph_2(slider_Medu, slider_Mjob, slider_Fedu, slider_Fjob):
 @app.callback(
     Output(component_id='GA_Performance', component_property='figure'),
     Input(component_id='CbxAlcGout', component_property='value'))
-def update_graph(CbxAlcGout):
+def update_graph_3(CbxAlcGout):
     if CbxAlcGout is None:
         pathFig=["Alcohol_General_Consumption"]
     pathFig=[*CbxAlcGout, 'Grade_appreciation','Grade']
@@ -418,13 +421,12 @@ def update_graph(CbxAlcGout):
                       color_continuous_scale='ylorrd',
                       color_continuous_midpoint=np.average(df_GoOut_Alcohol['Grade'],
                                                            weights=df_GoOut_Alcohol['Number of Students']))
-    # fig.update_layout(title_text='<SPAN STYLE="text-decoration:underline">'
-    #                               '<b>The effect of going out and use of alchohol on students performance Grades</b>'
-    #                               '</SPAN> ', title_x=0.5, margin=dict(t=100, b=100))
-    fig.update_layout(title_text='', title_x=0.5, margin=dict(t=100,b=100))
+    fig.update_layout(title_text='<SPAN STYLE="text-decoration:underline">'
+                                  '<b>The effect of going out and use of alchohol on students performance Grades</b>'
+                                  '</SPAN> ', title_x=0.5, margin=dict(t=100))
     fig.add_annotation(
-        x=0.5, y=-0.35,
-        text="The majority of good grades are gotten by the students who don't go out so often with their and also "
+        x=0.5, y=-0.25,
+        text="The majority of good grades are gotten by the students who don'tgo out so often with their and also "
              "don't drink alcohol or very little.",
         font_size=15,
         xref="paper", yref="paper",
@@ -439,7 +441,7 @@ def update_graph(CbxAlcGout):
 @app.callback(
     Output(component_id='Alc_Health', component_property='figure'),
     Input(component_id='RbxAlcHealth', component_property='value'))
-def update_graph(RbxAlcHealth):
+def update_graph_4(RbxAlcHealth):
     df_AH=df_Alcohol_Health.query("Alcohol==" + str(int(RbxAlcHealth)))
     df_AH.sort_values(by=["health", "Number of Students", "Alcohol"])
     fig = px.pie(df_AH, values='Number of Students', names='health',hole=0.4, color_discrete_map={'1':'lightcyan',
@@ -447,11 +449,11 @@ def update_graph(RbxAlcHealth):
                                  '3':'royalblue',
                                  '4':'darkblue',
                                  '5':'red'})
-    # fig.update_layout(title_text='<SPAN STYLE="text-decoration:underline">'
-    #                               '<b>The impact of alcohol use on students health</b>'
-    #                               '</SPAN> ', title_x=0.5, margin=dict(t=100, b=100))
+    fig.update_layout(title_text='<SPAN STYLE="text-decoration:underline">'
+                                  '<b>The impact of alcohol use on students health</b>'
+                                  '</SPAN> ', title_x=0.5, margin=dict(t=100))
 
-    fig.update_layout(title_text='', title_x=0.5, margin=dict(t=100,b=100))
+    #fig.update_layout(title_text='', title_x=0.5, margin=dict(t=100,b=100))
     # fig.add_annotation(
     #     x=0.5, y=-0.35,
     #     text="The majority of good grades are gotten by the students who don't go out so often with their and also "
