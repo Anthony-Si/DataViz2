@@ -195,24 +195,20 @@ app.layout = html.Div(children=[
         id='SI_Performance',
         figure=fig1
     ),
-    html.P("FilterBy:"),
-    # dcc.Dropdown(id='FilterT',
-    #     options=['smoker', 'day', 'time', 'sex'],
-    #     value='day', clearable=False
-    # ),
-    dcc.Checklist(
-        id='CbxAlcGout',
-        options=[
-           {'label': 'Alcohol consumption (on daily basis)', 'value': 'Alcohol_General_Consumption'},
-           {'label': 'Going out', 'value': 'goout_Def'}
-        ],
-        value=['Alcohol_General_Consumption', 'goout_Def']
-    ),
-    dcc.Graph(id="GA_Performance"),
-    # dcc.Graph(
-    #     id='GA_Performance',
-    #     figure=fig2
-    # ),
+    html.Div(children=[
+        html.H2("The effect of going out and use of alchohol on students performance Grades", style={"justify": "center", "text-decoration": "underline"}),
+        html.P("FilterBy:"),
+        dcc.Checklist(
+            id='CbxAlcGout',
+            options=[
+               {'label': 'Alcohol consumption (on daily basis)', 'value': 'Alcohol_General_Consumption'},
+               {'label': 'Going out', 'value': 'goout_Def'}
+            ],
+            value=['Alcohol_General_Consumption', 'goout_Def']
+        ),
+        dcc.Graph(id="GA_Performance")
+    ]),
+
     html.Div(children=[
         html.H4("Supporter 1"),
         dcc.Dropdown(sorted(df_support['support'].unique()), "Family", id='support_drop')
@@ -392,13 +388,23 @@ def update_graph(CbxAlcGout):
                       path=pathFig,
                       values='Number of Students',
                       color='Grade', #hover_data=['Number of Students'],
-                      color_continuous_scale='plasma',
+                      color_continuous_scale='ylorrd',
                       color_continuous_midpoint=np.average(df_GoOut_Alcohol['Grade'],
                                                            weights=df_GoOut_Alcohol['Number of Students']))
-    fig.update_layout(title_text='<SPAN STYLE="text-decoration:underline">'
-                                  '<b>The effect of going out and use of alchohol on students performance Grades</b>'
-                                  '</SPAN> ', title_x=0.5, margin=dict(t=100, b=100))
-
+    # fig.update_layout(title_text='<SPAN STYLE="text-decoration:underline">'
+    #                               '<b>The effect of going out and use of alchohol on students performance Grades</b>'
+    #                               '</SPAN> ', title_x=0.5, margin=dict(t=100, b=100))
+    fig.update_layout(title_text='', title_x=0.5, margin=dict(t=100,b=100))
+    fig.add_annotation(
+        x=0.5, y=-0.35,
+        text="The majority of good grades are gotten by the students who don't go out so often with their and also "
+             "don't drink alcohol or very little.",
+        font_size=15,
+        xref="paper", yref="paper",
+        showarrow=False,
+        bordercolor='red',
+        borderpad=10
+    )
     return fig
 
 if __name__ == '__main__':
