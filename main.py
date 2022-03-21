@@ -42,7 +42,7 @@ fig0.update_layout(title_text='<SPAN STYLE="text-decoration:underline">'
                               '</SPAN> ', title_x=0.5, margin=dict(t=100, b=100))
 fig0.add_annotation(
     x=0.5, y=-0.35,
-    text="We can see that Studying while having Internet Access can affect badly the performance(grades) of "
+    text="We can see that Studying while having Internet Access can affect negatively the performance(grades) of "
          "students.",
     font_size=15,
     xref="paper", yref="paper",
@@ -84,42 +84,45 @@ fig1.add_annotation(
 # C - The effect of going out and use of alchohol on students performance Grades
 df_GoOut_Alcohol = df_students.loc[:, ["Dalc", "Walc", "goout", "failures", "G1", "G2", "G3"]]
 df_GoOut_Alcohol["Grade"] = round((df_GoOut_Alcohol["G1"] + df_GoOut_Alcohol["G2"] + df_GoOut_Alcohol["G3"]) / 3, 2)
-df_GoOut_Alcohol["Grade_appreciation"]=0
-df_GoOut_Alcohol["Grade_appreciation"]=df_GoOut_Alcohol["Grade_appreciation"].mask(df_GoOut_Alcohol["Grade"]<8,"grade less than 8")
-df_GoOut_Alcohol["Grade_appreciation"]=df_GoOut_Alcohol["Grade_appreciation"].mask((df_GoOut_Alcohol["Grade"]>=8) & (df_GoOut_Alcohol["Grade"]<13),"grade between 8 and 12")
-df_GoOut_Alcohol["Grade_appreciation"]=df_GoOut_Alcohol["Grade_appreciation"].mask(df_GoOut_Alcohol["Grade"]>=13,"grade over 13")
-df_GoOut_Alcohol["Alcohol"]=round((df_GoOut_Alcohol["Dalc"]+df_GoOut_Alcohol["Walc"])/2,0)
-df_GoOut_Alcohol["Alcohol_General_Consumption"]=df_GoOut_Alcohol.Alcohol.map({1: 'very low consumption of alcohol',
-                                           2: 'low consumption of alcohol',
-                                           3: 'medium consumption of alcohol',
-                                           4: 'high consumption of alcohol',
-                                           5: 'very high consumption of alcohol'})
-df_GoOut_Alcohol["goout_Def"]=df_GoOut_Alcohol.Alcohol.map({1: 'go out very rarely',
-                                           2: 'go out rarely',
-                                           3: 'go out sometime',
-                                           4: 'go out often',
-                                           5: 'go out a lot'})
-df_GoOut_Alcohol = (df_GoOut_Alcohol.groupby(["goout_Def", "Grade_appreciation","Grade","Alcohol_General_Consumption"]).size()
-              .sort_values(ascending=False)
-              .reset_index(name='Number of Students'))
-df_GoOut_Alcohol.sort_values(by=["goout_Def", "Number of Students", "Grade_appreciation","Alcohol_General_Consumption"])
+df_GoOut_Alcohol["Grade_appreciation"] = 0
+df_GoOut_Alcohol["Grade_appreciation"] = df_GoOut_Alcohol["Grade_appreciation"].mask(df_GoOut_Alcohol["Grade"] < 8,
+                                                                                     "grade less than 8")
+df_GoOut_Alcohol["Grade_appreciation"] = df_GoOut_Alcohol["Grade_appreciation"].mask(
+    (df_GoOut_Alcohol["Grade"] >= 8) & (df_GoOut_Alcohol["Grade"] < 13), "grade between 8 and 12")
+df_GoOut_Alcohol["Grade_appreciation"] = df_GoOut_Alcohol["Grade_appreciation"].mask(df_GoOut_Alcohol["Grade"] >= 13,
+                                                                                     "grade over 13")
+df_GoOut_Alcohol["Alcohol"] = round((df_GoOut_Alcohol["Dalc"] + df_GoOut_Alcohol["Walc"]) / 2, 0)
+df_GoOut_Alcohol["Alcohol_General_Consumption"] = df_GoOut_Alcohol.Alcohol.map({1: 'very low consumption of alcohol',
+                                                                                2: 'low consumption of alcohol',
+                                                                                3: 'medium consumption of alcohol',
+                                                                                4: 'high consumption of alcohol',
+                                                                                5: 'very high consumption of alcohol'})
+df_GoOut_Alcohol["goout_Def"] = df_GoOut_Alcohol.Alcohol.map({1: 'go out very rarely',
+                                                              2: 'go out rarely',
+                                                              3: 'go out sometime',
+                                                              4: 'go out often',
+                                                              5: 'go out a lot'})
+df_GoOut_Alcohol = (
+    df_GoOut_Alcohol.groupby(["goout_Def", "Grade_appreciation", "Grade", "Alcohol_General_Consumption"]).size()
+    .sort_values(ascending=False)
+    .reset_index(name='Number of Students'))
+df_GoOut_Alcohol.sort_values(
+    by=["goout_Def", "Number of Students", "Grade_appreciation", "Alcohol_General_Consumption"])
 df_GoOut_Alcohol
 
 # --------------------------------------------------------------------------------------------------------------#
 # D - The effect of alchohol on students health
 df_Alcohol_Health = df_students.loc[:, ["Dalc", "Walc", "health"]]
-df_Alcohol_Health["Alcohol"]=round((df_Alcohol_Health["Dalc"]+df_Alcohol_Health["Walc"])/2,0)
-df_Alcohol_Health["health_desc"]=df_Alcohol_Health.health.map({1: 'very bad condition of health',
-                                           2: 'bad condition of health',
-                                           3: 'medium condition of health',
-                                           4: 'good condition of health',
-                                           5: 'very good condition of health'})
-df_Alcohol_Health = (df_Alcohol_Health.groupby(["Alcohol","health_desc"]).size()
-              .sort_values(ascending=False)
-              .reset_index(name='Number of Students'))
+df_Alcohol_Health["Alcohol"] = round((df_Alcohol_Health["Dalc"] + df_Alcohol_Health["Walc"]) / 2, 0)
+df_Alcohol_Health["health_desc"] = df_Alcohol_Health.health.map({1: 'very bad condition of health',
+                                                                 2: 'bad condition of health',
+                                                                 3: 'medium condition of health',
+                                                                 4: 'good condition of health',
+                                                                 5: 'very good condition of health'})
+df_Alcohol_Health = (df_Alcohol_Health.groupby(["Alcohol", "health_desc"]).size()
+                     .sort_values(ascending=False)
+                     .reset_index(name='Number of Students'))
 df_Alcohol_Health
-
-
 
 # --------------------------------------------------------------------------------------------------------------#
 # H- the effect of having family, School support and Private classes on performance of students
@@ -155,20 +158,17 @@ df_gender_ages = (df_gender_ages.groupby(["sex", "age", "Grade"]).size()
                   .reset_index(name='#Students'))
 df_gender_ages = df_gender_ages.sort_values(by=["Grade", "#Students", "age"])
 
-
 # F- 8-the effect of travel time and reason on absences
-df_TT_Loc_Rsn=df_students.loc[:,["address", "traveltime","reason","absences","G1", "G2", "G3"]].sort_values(by=["reason","traveltime", "address","absences"])
-df_TT_Loc_Rsn["Grade"]=round((df_TT_Loc_Rsn["G1"]+df_TT_Loc_Rsn["G2"]+df_TT_Loc_Rsn["G3"])/3,0)
+df_TT_Loc_Rsn = df_students.loc[:, ["address", "traveltime", "reason", "absences", "G1", "G2", "G3"]].sort_values(
+    by=["reason", "traveltime", "address", "absences"])
+df_TT_Loc_Rsn["Grade"] = round((df_TT_Loc_Rsn["G1"] + df_TT_Loc_Rsn["G2"] + df_TT_Loc_Rsn["G3"]) / 3, 0)
 df_TT_Loc_Rsn["Location"] = df_TT_Loc_Rsn.address.map({'R': 'Rural',
-                                           'U': 'Urban'})
-df_TT_Loc_Rsn["Trvl_Time"] = df_TT_Loc_Rsn.traveltime.map({1 : "<15 min",
-                                                       2 : "15 to 30 min",
-                                                       3 : "30 min to 1 hour",
-                                                       4 : ">1 hour"})
-#df_TT_Loc_Rsn.groupby(by=["Trvl_Time","reason","Location"]).mean().loc[:,["absences","Grade"]]
-
-
-
+                                                       'U': 'Urban'})
+df_TT_Loc_Rsn["Trvl_Time"] = df_TT_Loc_Rsn.traveltime.map({1: "<15 min",
+                                                           2: "15 to 30 min",
+                                                           3: "30 min to 1 hour",
+                                                           4: ">1 hour"})
+# df_TT_Loc_Rsn.groupby(by=["Trvl_Time","reason","Location"]).mean().loc[:,["absences","Grade"]]
 
 
 # --------------------------------------------------------------------------------------------------------------#
@@ -207,13 +207,10 @@ df_S_bkgrd_MF = (df_S_bkgrd_MF.groupby(
 df_S_bkgrd_MF = df_S_bkgrd_MF.sort_values(by="Grade")
 df_S_bkgrd_MF
 
-
-#I -9 having a fullfied emotional needs ( family,relationship,extracurricular) effect on performance
+# I -9 having a fullfied emotional needs ( family,relationship,extracurricular) effect on performance
 # df_EmtFll = df_students.loc[:, ["famsup", "romantic", "activities", "G1", "G2", "G3"]]
 # df_EmtFll["Grade"] = round((df_EmtFll["G1"] + df_EmtFll["G2"] + df_EmtFll["G3"]) / 3, 2)
 # df_EmtFll=df_students.groupby(by=["famsup","romantic","activities"],as_index=False).mean().loc[:,["famsup","romantic","activities","absences", "Grade"]]
-
-
 
 
 # Application  Dash
@@ -235,48 +232,48 @@ app.layout = html.Div(children=[
         figure=fig1
     ),
     html.Div(children=[
-        #html.H2("The effect of going out and use of alchohol on students performance Grades", style={"justify": "center", "text-decoration": "underline"}),
+        # html.H2("The effect of going out and use of alchohol on students performance Grades", style={"justify": "center", "text-decoration": "underline"}),
         html.H4("FilterBy:"),
         dcc.Checklist(
             id='CbxAlcGout',
             options=[
-               {'label': 'Alcohol consumption (on daily basis)', 'value': 'Alcohol_General_Consumption'},
-               {'label': 'Going out', 'value': 'goout_Def'}
+                {'label': 'Alcohol consumption (on daily basis)', 'value': 'Alcohol_General_Consumption'},
+                {'label': 'Going out', 'value': 'goout_Def'}
             ],
             value=['Alcohol_General_Consumption', 'goout_Def'],
-            inputStyle = {'margin-left':'20px'}
+            inputStyle={'margin-left': '20px'}
         ),
         dcc.Graph(id="GA_Performance")
     ]),
     html.Div(children=[
-            #html.H2("The effect of alchohol use on students health", style={"justify": "center", "text-decoration": "underline"}),
-            html.H4("FilterBy:"),
-            dcc.RadioItems(
-               id='RbxAlcHealth',
-               options=[
-                   {'label': 'very low consumption of alcohol', 'value': '1'},
-                   {'label': 'low consumption of alcohol', 'value': '2'},
-                   {'label': 'medium consumption of alcohol', 'value': '3'},
-                   {'label': 'high consumption of alcohol', 'value': '4'},
-                   {'label': 'very high consumption of alcohol', 'value': '5'},
-               ],
-               value='1',
-                inputStyle = {'margin-left':'20px'}
-            ),
-            dcc.Graph(id="Alc_Health")
+        # html.H2("The effect of alchohol use on students health", style={"justify": "center", "text-decoration": "underline"}),
+        html.H4("FilterBy:"),
+        dcc.RadioItems(
+            id='RbxAlcHealth',
+            options=[
+                {'label': 'very low consumption of alcohol', 'value': '1'},
+                {'label': 'low consumption of alcohol', 'value': '2'},
+                {'label': 'medium consumption of alcohol', 'value': '3'},
+                {'label': 'high consumption of alcohol', 'value': '4'},
+                {'label': 'very high consumption of alcohol', 'value': '5'},
+            ],
+            value='1',
+            inputStyle={'margin-left': '20px'}
+        ),
+        dcc.Graph(id="Alc_Health")
     ]),
     html.Div(children=[
-            html.H4("Filter on:"),
-            dcc.RadioItems(
-               id='RbxTTRsn',
-               options=[
-                   {'label': 'Travel time', 'value': 'Trvl_Time'},
-                   {'label': 'Reason to attend the school', 'value': 'reason'},
-               ],
-               value='Trvl_Time',
-                inputStyle = {'margin-left':'20px'}
-            ),
-            dcc.Graph(id="TTLocRsn_absences")
+        html.H4("Filter on:"),
+        dcc.RadioItems(
+            id='RbxTTRsn',
+            options=[
+                {'label': 'Travel time', 'value': 'Trvl_Time'},
+                {'label': 'Reason to attend the school', 'value': 'reason'},
+            ],
+            value='Trvl_Time',
+            inputStyle={'margin-left': '20px'}
+        ),
+        dcc.Graph(id="TTLocRsn_absences")
     ]),
     # html.Div(children=[
     #         html.H4("Family support:"),
@@ -397,9 +394,9 @@ app.layout = html.Div(children=[
     Input(component_id='support_drop1', component_property='value'))
 def update_graph(support_drop, support_drop1):
     if support_drop is None:
-        support_drop="Family"
+        support_drop = "Family"
     if support_drop1 is None:
-        support_drop1="School"
+        support_drop1 = "School"
 
     df = df_support[(df_support['support'] == support_drop) | (df_support['support'] == support_drop1)]
     fig = px.line(df, y="Number of Students", x="Grade", color=df_support.columns[0],
@@ -427,9 +424,9 @@ def update_graph(support_drop, support_drop1):
     Input(component_id='age_drop_1', component_property='value'))
 def update_graph_1(age_drop, age_drop_1):
     if age_drop is None:
-        age_drop=15
+        age_drop = 15
     if age_drop_1 is None:
-        age_drop_1=15
+        age_drop_1 = 15
     if age_drop > age_drop_1:
         temp = age_drop
         age_drop = age_drop_1
@@ -465,7 +462,7 @@ def update_graph_2(slider_Medu, slider_Mjob, slider_Fedu, slider_Fjob):
     fig_t.update_layout(title_text='<SPAN STYLE="text-decoration:underline">'
                                    '<b>The effect of Mother & Father background on Grades & Number of students aiming '
                                    'for higher education.</b> '
-                                   '</SPAN> ', title_x=0.5, margin=dict(t=100,b=100))
+                                   '</SPAN> ', title_x=0.5, margin=dict(t=100, b=100))
     fig_t.add_annotation(
         x=0.5, y=-0.35,
         text="We can see that parents with higher educational background & social status have children that more likely "
@@ -478,28 +475,29 @@ def update_graph_2(slider_Medu, slider_Mjob, slider_Fedu, slider_Fjob):
     )
     return fig_t
 
-#C- Section going out and alcohol consumption impact on performance
+
+# C- Section going out and alcohol consumption impact on performance
 @app.callback(
     Output(component_id='GA_Performance', component_property='figure'),
     Input(component_id='CbxAlcGout', component_property='value'))
 def update_graph_3(CbxAlcGout):
     if CbxAlcGout is None:
-        pathFig=["Alcohol_General_Consumption"]
-    pathFig=[*CbxAlcGout, 'Grade_appreciation','Grade']
+        pathFig = ["Alcohol_General_Consumption"]
+    pathFig = [*CbxAlcGout, 'Grade_appreciation', 'Grade']
     fig = px.treemap(df_GoOut_Alcohol,
-                      path=pathFig,
-                      values='Number of Students',
-                      color='Grade', #hover_data=['Number of Students'],
-                      color_continuous_scale='ylorrd',
-                      color_continuous_midpoint=np.average(df_GoOut_Alcohol['Grade'],
-                                                           weights=df_GoOut_Alcohol['Number of Students']))
+                     path=pathFig,
+                     values='Number of Students',
+                     color='Grade',  # hover_data=['Number of Students'],
+                     color_continuous_scale='ylorrd',
+                     color_continuous_midpoint=np.average(df_GoOut_Alcohol['Grade'],
+                                                          weights=df_GoOut_Alcohol['Number of Students']))
     fig.update_layout(title_text='<SPAN STYLE="text-decoration:underline">'
-                                  '<b>The effect of going out and use of alchohol on students performance Grades</b>'
-                                  '</SPAN> ', title_x=0.5, margin=dict(t=100))
+                                 '<b>The effect of going out and use of alchohol on students performance Grades</b>'
+                                 '</SPAN> ', title_x=0.5, margin=dict(t=100))
     fig.add_annotation(
         x=0.5, y=-0.25,
-        text="The majority of good grades are gotten by the students who don'tgo out so often with their and also "
-             "don't drink alcohol or very little.",
+        text="The majority of good grades are gotten by the students who don't Go out so often with their "
+             "friends and also don't drink Alcohol or drink very little of it.",
         font_size=15,
         xref="paper", yref="paper",
         showarrow=False,
@@ -509,60 +507,63 @@ def update_graph_3(CbxAlcGout):
     return fig
 
 
-#D- Section going out and alcohol consumption impact on performance
+# D- Section going out and alcohol consumption impact on performance
 @app.callback(
     Output(component_id='Alc_Health', component_property='figure'),
     Input(component_id='RbxAlcHealth', component_property='value'))
 def update_graph_4(RbxAlcHealth):
-    df_AH=df_Alcohol_Health.query("Alcohol==" + str(int(RbxAlcHealth)))
+    df_AH = df_Alcohol_Health.query("Alcohol==" + str(int(RbxAlcHealth)))
     df_AH.sort_values(by=["health_desc", "Number of Students", "Alcohol"])
-    fig = px.pie(df_AH, values='Number of Students', names='health_desc',hole=0.4)
-    fig.update_layout(title_text='<SPAN STYLE="text-decoration:underline">'
-                                  '<b>The impact of alcohol use on students health</b>'
-                                  '</SPAN> ', title_x=0.5, margin=dict(t=100))
+    fig = px.pie(df_AH, values='Number of Students', names='health_desc', hole=0.4,color="health_desc",
+                 color_discrete_map={"very bad condition of health": "#7f0000",
+                                     "bad condition of health": "#990000",
+                                     'medium condition of health': '#cc0000',
+                                     'good condition of health': '#e50000',
+                                     'very good condition of health': '#ff0000'})
 
-    #fig.update_layout(title_text='', title_x=0.5, margin=dict(t=100,b=100))
-    # fig.add_annotation(
-    #     x=0.5, y=-0.35,
-    #     text="The majority of good grades are gotten by the students who don't go out so often with their and also "
-    #          "don't drink alcohol or very little.",
-    #     font_size=15,
-    #     xref="paper", yref="paper",
-    #     showarrow=False,
-    #     bordercolor='red',
-    #     borderpad=10
-    # )
+    fig.update_layout(title_text='<SPAN STYLE="text-decoration:underline">'
+                                 '<b>The impact of alcohol use on students health</b>'
+                                 '</SPAN> ', title_x=0.5, margin=dict(t=100))
+
+    fig.update_layout(title_text='', title_x=0.5, margin=dict(t=100, b=100))
+    fig.add_annotation(
+        x=0.5, y=-0.35,
+        text="The students have better health levels having less consumption of Alcohol.",
+        font_size=15,
+        xref="paper", yref="paper",
+        showarrow=False,
+        bordercolor='red',
+        borderpad=10
+    )
     return fig
 
 
-
-#F- Section impact of travel time, reason and location on absences
+# F- Section impact of travel time, reason and location on absences
 @app.callback(
     Output(component_id='TTLocRsn_absences', component_property='figure'),
     Input(component_id='RbxTTRsn', component_property='value'))
 def update_graph_5(RbxTTRsn):
-    df_tmp=df_TT_Loc_Rsn.groupby(by=["Location", RbxTTRsn], as_index= False).sum()
+    df_tmp = df_TT_Loc_Rsn.groupby(by=["Location", RbxTTRsn], as_index=False).sum()
     df_tmp.sort_values(by=['absences', RbxTTRsn])
     fig = px.funnel(df_tmp, x='absences', y=RbxTTRsn, color='Location')
 
     fig.update_layout(title_text='<SPAN STYLE="text-decoration:underline">'
-                                  '<b>The impact of travel time, reason and location on students absences</b>'
-                                  '</SPAN> ', title_x=0.5, margin=dict(t=100))
+                                 '<b>The impact of travel time, reason and location on students absences</b>'
+                                 '</SPAN> ', title_x=0.5, margin=dict(t=100, b=100))
 
-    #fig.update_layout(title_text='', title_x=0.5, margin=dict(t=100,b=100))
-    # fig.add_annotation(
-    #     x=0.5, y=-0.35,
-    #     text="The majority of good grades are gotten by the students who don't go out so often with their and also "
-    #          "don't drink alcohol or very little.",
-    #     font_size=15,
-    #     xref="paper", yref="paper",
-    #     showarrow=False,
-    #     bordercolor='red',
-    #     borderpad=10
-    # )
+    fig.add_annotation(
+        x=0.5, y=-0.35,
+        text="We observe a great increase of absences when the students take little time to go school and the reason "
+             "they join a school also impact the absences.",
+        font_size=15,
+        xref="paper", yref="paper",
+        showarrow=False,
+        bordercolor='red',
+        borderpad=10)
     return fig
 
-#I- Section impact of emtional fulfillement on performances
+
+# I- Section impact of emtional fulfillement on performances
 # @app.callback(
 #     Output(component_id='EmtFlfllmnt_Perfs', component_property='figure'),
 #     Input(component_id='Rbxfmsp', component_property='value'),
@@ -576,18 +577,18 @@ def update_graph_5(RbxTTRsn):
 #                                   '<b>The emotional fullfilment impact on Students performances and absences</b>'
 #                                   '</SPAN> ', title_x=0.5, margin=dict(t=100))
 
-    #fig.update_layout(title_text='', title_x=0.5, margin=dict(t=100,b=100))
-    # fig.add_annotation(
-    #     x=0.5, y=-0.35,
-    #     text="The majority of good grades are gotten by the students who don't go out so often with their and also "
-    #          "don't drink alcohol or very little.",
-    #     font_size=15,
-    #     xref="paper", yref="paper",
-    #     showarrow=False,
-    #     bordercolor='red',
-    #     borderpad=10
-    # )
-    # return fig
+# fig.update_layout(title_text='', title_x=0.5, margin=dict(t=100,b=100))
+# fig.add_annotation(
+#     x=0.5, y=-0.35,
+#     text="The majority of good grades are gotten by the students who don't go out so often with their and also "
+#          "don't drink alcohol or very little.",
+#     font_size=15,
+#     xref="paper", yref="paper",
+#     showarrow=False,
+#     bordercolor='red',
+#     borderpad=10
+# )
+# return fig
 
 if __name__ == '__main__':
     app.run_server(debug=True)
